@@ -1,6 +1,6 @@
 ﻿using ModelContextProtocol.Server;
 using System.ComponentModel;
-using System.Net.Http.Json;
+using System.Globalization;
 using System.Text.Json;
 
 namespace QuickstartWeatherServer.Tools;
@@ -13,7 +13,10 @@ public static class WeatherTools
         HttpClient client,
         [Description("The US state to get alerts for.")] string state)
     {
-        var jsonElement = await client.GetFromJsonAsync<JsonElement>($"/alerts/active/area/{state}");
+        using var jsonDocument = await client.ReadJsonDocumentAsync($"/alerts/active/area/{state}");
+
+        var jsonElement = jsonDocument.RootElement;
+
         var alerts = jsonElement.GetProperty("features").EnumerateArray();
 
         if (!alerts.Any())
@@ -40,8 +43,16 @@ public static class WeatherTools
         [Description("Latitude of the location.")] double latitude,
         [Description("Longitude of the location.")] double longitude)
     {
-        var jsonElement = await client.GetFromJsonAsync<JsonElement>($"/points/{latitude},{longitude}");
-        var periods = jsonElement.GetProperty("properties").GetProperty("periods").EnumerateArray();
+        var pointUrl = string.Create(CultureInfo.InvariantCulture, $"/points/{latitude},{longitude}");
+
+        using var jsonDocument = await client.ReadJsonDocumentAsync(pointUrl);
+
+        var forecastUrl = jsonDocument.RootElement.GetProperty("properties").GetProperty("forecast").GetString()
+            ?? throw new Exception($"No forecast URL provided by {client.BaseAddress}points/{latitude},{longitude}");
+
+        using var forecastDocument = await client.ReadJsonDocumentAsync(forecastUrl);
+
+        var periods = forecastDocument.RootElement.GetProperty("properties").GetProperty("periods").EnumerateArray();
 
         return string.Join("\n---\n", periods.Select(period => $"""
                 {period.GetProperty("name").GetString()}
