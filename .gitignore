@@ -54,3 +54,4 @@ TestResult.xml
 nunit-*.xml
 /.vs/modelcontextprotocol-quickstart
 /.vs/ProjectEvaluation
+/src/AspNetCoreSseServer/AspNetCoreSseServer.csproj.user
