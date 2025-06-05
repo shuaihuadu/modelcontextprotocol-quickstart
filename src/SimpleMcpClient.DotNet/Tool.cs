@@ -1,28 +1,18 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace SimpleMcpClient;
 
-public class Tool
+public class Tool(string name, string description, JsonElement inputSchema)
 {
-    public string Name { get; }
-    public string Description { get; }
-    public JsonElement InputSchema { get; }
-
-    public Tool(string name, string description, JsonElement inputSchema)
-    {
-        this.Name = name;
-        this.Description = description;
-        this.InputSchema = inputSchema;
-    }
+    public string Name { get; } = name;
+    public string Description { get; } = description;
+    public JsonElement InputSchema { get; } = inputSchema;
 
     /// <summary>
     /// 格式化工具信息供LLM使用
     /// </summary>
     public string FormatForLlm()
     {
-        var argsDesc = new StringBuilder();
-
         IReadOnlyList<string> parameterMetas = MapParameterMetadata(InputSchema);
 
         return $@"
@@ -32,7 +22,7 @@ public class Tool
 {string.Join(Environment.NewLine, parameterMetas)}";
     }
 
-    private static IReadOnlyList<string> MapParameterMetadata(JsonElement schema)
+    private static List<string> MapParameterMetadata(JsonElement schema)
     {
         List<string> metadata = [];
 

@@ -5,20 +5,16 @@ using System.Text;
 using System.Text.Json;
 using ChatMessage = OpenAI.Chat.ChatMessage;
 
-
 namespace SimpleMcpClient;
 
-public class ChatSession
+public class ChatSession(LLMClient llmClient)
 {
-    private readonly LLMClient _llmClient;
     private readonly List<ChatMessage> _messages = [];
-
-    public ChatSession(LLMClient llmClient) => _llmClient = llmClient;
 
     /// <summary>
     /// 处理LLM响应并执行工具
     /// </summary>
-    public async Task<string> ProcessLlmResponseAsync(string llmResponse)
+    public static async Task<string> ProcessLlmResponseAsync(string llmResponse)
     {
         try
         {
@@ -30,7 +26,7 @@ public class ChatSession
 
                 var arguments = JsonSerializer.Deserialize<Dictionary<string, object?>>(value!.ToString());
 
-                var tools = await this.ListToolsAsync();
+                var tools = await ListToolsAsync();
 
                 if (tools.Exists(t => t.Name == toolName))
                 {
@@ -79,7 +75,7 @@ public class ChatSession
     public async Task StartAsync()
     {
         // 收集所有工具描述
-        var allTools = await this.ListToolsAsync(true);
+        var allTools = await ListToolsAsync(true);
 
         // 构建系统提示
         var toolsDescription = new StringBuilder();
@@ -135,7 +131,7 @@ public class ChatSession
 
             _messages.Add(new UserChatMessage(input));
 
-            string llmResponse = await _llmClient.GetResponseAsync(_messages);
+            string llmResponse = await llmClient.GetResponseAsync(_messages);
 
             Console.WriteLine($"Assistant: {llmResponse}");
 
@@ -148,7 +144,7 @@ public class ChatSession
 
                 _messages.Add(new SystemChatMessage(response));
 
-                string finalResponse = await _llmClient.GetResponseAsync(_messages);
+                string finalResponse = await llmClient.GetResponseAsync(_messages);
 
                 Console.WriteLine($"最终回复: {finalResponse}");
 
@@ -161,7 +157,7 @@ public class ChatSession
         }
     }
 
-    private async Task<List<Tool>> ListToolsAsync(bool output = false)
+    private static async Task<List<Tool>> ListToolsAsync(bool output = false)
     {
         // 收集所有工具描述
         List<Tool> tools = [];
