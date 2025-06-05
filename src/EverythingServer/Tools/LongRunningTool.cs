@@ -1,5 +1,5 @@
 ﻿using ModelContextProtocol;
-using ModelContextProtocol.Protocol.Types;
+using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 
 namespace EverythingServer.Tools;

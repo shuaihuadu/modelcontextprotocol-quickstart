@@ -484,3 +484,4 @@ playwright-report/
 
 # python devcontainer
 /python/.devcontainer/*
+/src/SimpleMcpClient.DotNet/appsettings.json
