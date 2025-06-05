@@ -45,7 +45,7 @@ class ChatSession:
                     tools = await server.list_tools()
                     if any(tool.name == tool_call["tool"] for tool in tools):
                         try:
-                            # µÈ´ı MCP Server µÄ Tool ´¦Àí
+                            # ç­‰å¾… MCP Server çš„ Tool å¤„ç†
                             logging.info(f"Waiting MCP Server Tool to process...")
                             result = await server.execute_tool(
                                 tool_call["tool"], tool_call["arguments"]
