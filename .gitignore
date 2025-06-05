@@ -55,3 +55,5 @@ nunit-*.xml
 /.vs/modelcontextprotocol-quickstart
 /.vs/ProjectEvaluation
 /src/AspNetCoreSseServer/AspNetCoreSseServer.csproj.user
+/src/SimpleMcpClient/.env
+/src/SimpleMcpClient/__pycache__
